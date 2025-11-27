@@ -46,6 +46,7 @@ jobs:
 
           # Run Docker Compose
           cd $REPO_DIR
+          docker compose down
           docker compose up -d --build
 
           EOF
