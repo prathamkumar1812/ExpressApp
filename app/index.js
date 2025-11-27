@@ -13,7 +13,7 @@ app.get("/", async (req, res) => {
   count = count ? Number(count) + 1 : 1;
 
   await client.set("count", count);
-  res.send(`Hello from Express! Visits: ${count}`);
+  res.send(`Hello from Express! Visits: ${count} new value`);
 });
 
 app.listen(3000, () => {
