@@ -10,40 +10,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup SSH
-      uses: webfactory/ssh-agent@v0.9.0
-      with:
-        ssh-private-key: ${{ secrets.AZURE_VM_SSH_KEY }}
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.AZURE_VM_SSH_KEY }}
 
-    - name: Deploy on Azure VM
-      run: |
-        ssh -o StrictHostKeyChecking=no azureuser@${{ secrets.AZURE_VM_PUBLIC_IP }} << 'EOF'
-        
-        # Install Docker if missing
-        if ! command -v docker &> /dev/null; then
-            curl -fsSL https://get.docker.com -o get-docker.sh
-            sudo sh get-docker.sh
-        fi
+      - name: Deploy on Azure VM
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@${{ secrets.AZURE_VM_PUBLIC_IP }} << 'EOF'
+          
+          # Install Docker if missing
+          if ! command -v docker &> /dev/null; then
+              curl -fsSL https://get.docker.com -o get-docker.sh
+              sudo sh get-docker.sh
+          fi
 
-        # Install Docker Compose if missing
-        if ! command -v docker-compose &> /dev/null; then
-            sudo curl -L "https://github.com/docker/compose/releases/download/2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-        fi
+          # Install Docker Compose v2 if missing
+          if ! docker compose version &> /dev/null; then
+              sudo mkdir -p /usr/lib/docker/cli-plugins
+              sudo curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
+                  -o /usr/lib/docker/cli-plugins/docker-compose
+              sudo chmod +x /usr/lib/docker/cli-plugins/docker-compose
+          fi
 
-        # Clone or update repo
-        REPO_DIR=~/myapp
-        if [ -d "$REPO_DIR" ]; then
-            cd $REPO_DIR && git pull
-        else
-            git clone https://github.com/prathamkumar1812/ExpressApp.git $REPO_DIR
-        fi
+          # Clone or update repo
+          REPO_DIR=~/myapp
+          if [ -d "$REPO_DIR" ]; then
+              cd $REPO_DIR && git pull
+          else
+              git clone https://github.com/prathamkumar1812/ExpressApp.git $REPO_DIR
+          fi
 
-        # Run Docker Compose
-        cd $REPO_DIR
-        docker-compose up -d
-
-        EOF
+          # Run Docker Compose
+          cd $REPO_DIR
+          do
